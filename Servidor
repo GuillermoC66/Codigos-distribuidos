@@ -1,0 +1,75 @@
+import socket
+import datetime
+import threading
+import time
+
+# Dirección y puerto del servidor
+direcServidor = "0.0.0.0"
+puertoServidor = 9099
+
+# Contador de clientes conectados
+clientes_conectados = 0
+lock = threading.Lock()
+
+def manejar_cliente(socketConexion, addr, tiempo_servidor):
+    global clientes_conectados
+    
+    with lock:
+        clientes_conectados += 1
+        print(f"Conectado con cliente {addr}. Clientes activos: {clientes_conectados}")
+    
+    try:
+        # Obtener hora exacta del servidor
+        hora_servidor = datetime.datetime.now()
+        
+        # Enviar hora del servidor y tiempo de referencia
+        datos_envio = f"{hora_servidor.strftime('%Y%m%d %H:%M:%f')}|{tiempo_servidor}"
+        print(f"Enviando datos al cliente {addr}: {datos_envio}")
+        
+        socketConexion.send(datos_envio.encode())
+        
+    except Exception as e:
+        print(f"Error con cliente {addr}: {e}")
+    finally:
+        socketConexion.close()
+        with lock:
+            clientes_conectados -= 1
+            print(f"Cliente {addr} desconectado. Clientes activos: {clientes_conectados}")
+
+def servidor_tiempo():
+    # Abrimos el Socket
+    socketServidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socketServidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    
+    # Avisar al SO de creacion de socket y asociar el prog al socket
+    socketServidor.bind((direcServidor, puertoServidor))
+    # Escuchar la conexion y atenderla
+    socketServidor.listen(5)
+    
+    print(f"Servidor iniciado en {direcServidor}:{puertoServidor}")
+    print("Esperando conexiones de clientes...")
+    
+    # Tiempo de referencia del servidor
+    tiempo_referencia_servidor = time.time()
+    
+    while True:
+        try:
+            # Aceptar conexiones de clientes
+            socketConexion, addr = socketServidor.accept()
+            
+            # Crear hilo para manejar cada cliente
+            cliente_thread = threading.Thread(
+                target=manejar_cliente, 
+                args=(socketConexion, addr, tiempo_referencia_servidor)
+            )
+            cliente_thread.daemon = True
+            cliente_thread.start()
+            
+        except KeyboardInterrupt:
+            print("\nServidor detenido por el usuario")
+            break
+        except Exception as e:
+            print(f"Error aceptando conexión: {e}")
+
+if __name__ == "__main__":
+    servidor_tiempo()

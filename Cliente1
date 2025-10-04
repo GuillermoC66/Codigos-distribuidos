@@ -1,0 +1,111 @@
+import socket
+import time
+import datetime
+
+def convertirCadenaAHora(cadena):
+    formato = '%Y%m%d %H:%M:%f'
+    horaCadena = datetime.datetime.strptime(cadena, formato)
+    return horaCadena
+
+def comparar_tiempos(tiempo_cliente, tiempo_servidor, diferencia):
+    """
+    Compara los tiempos del cliente y servidor
+    C > Cc: El reloj del cliente está adelantado
+    C < Cc: El reloj del cliente está atrasado
+    C = Cc: Los relojes están sincronizados
+    """
+    if diferencia > 0:
+        estado = "C > Cc - El reloj del cliente está ADELANTADO"
+    elif diferencia < 0:
+        estado = "C < Cc - El reloj del cliente está ATRASADO"
+    else:
+        estado = "C = Cc - Los relojes están SINCRONIZADOS"
+    
+    print(f"\n--- ANÁLISIS DE TIEMPOS ---")
+    print(f"Hora del cliente (C): {datetime.datetime.fromtimestamp(tiempo_cliente)}")
+    print(f"Hora del servidor (Cc): {datetime.datetime.fromtimestamp(tiempo_servidor)}")
+    print(f"Diferencia: {diferencia:.6f} segundos")
+    print(f"Estado: {estado}")
+    print("--- FIN ANÁLISIS ---\n")
+
+def cliente_tiempo(num_cliente=1):
+    IPServidor = "localhost"
+    puertoservidor = 9099
+    
+    print(f"=== Cliente {num_cliente} iniciado ===")
+    
+    try:
+        # Tiempo de referencia del cliente
+        tiempo_referencia_cliente = time.time()
+        
+        # Apertura del socket
+        socketCliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        socketCliente.settimeout(10)  # Timeout de 10 segundos
+        
+        inicio = time.time()
+        # Solicitar conexión con el servidor
+        socketCliente.connect((IPServidor, puertoservidor))
+        
+        # Recibir del servidor
+        datos_recibidos = socketCliente.recv(1024).decode()
+        final = time.time()
+        
+        # Separar los datos recibidos
+        hora_cadena, tiempo_servidor_str = datos_recibidos.split('|')
+        tiempo_servidor_ref = float(tiempo_servidor_str)
+        
+        tiempo_total = final - inicio
+        mitad_tiempo = tiempo_total / 2
+        
+        # Convertir y calcular hora exacta
+        hora_servidor = convertirCadenaAHora(hora_cadena)
+        hora_exacta_calculada = hora_servidor + datetime.timedelta(seconds=mitad_tiempo)
+        
+        # Calcular diferencia entre relojes
+        tiempo_servidor_actual = tiempo_servidor_ref + tiempo_total
+        tiempo_cliente_actual = tiempo_referencia_cliente + tiempo_total
+        diferencia_relojes = tiempo_cliente_actual - tiempo_servidor_actual
+        
+        print(f"\n--- RESULTADOS CLIENTE {num_cliente} ---")
+        print(f"Tiempo total de ida y vuelta: {tiempo_total:.6f} segundos")
+        print(f"Tiempo estimado de ida: {mitad_tiempo:.6f} segundos")
+        print(f"Hora recibida del servidor: {hora_cadena}")
+        print(f"Hora exacta calculada: {hora_exacta_calculada}")
+        
+        # Comparar tiempos
+        comparar_tiempos(tiempo_cliente_actual, tiempo_servidor_actual, diferencia_relojes)
+        
+        socketCliente.close()
+        
+    except socket.timeout:
+        print(f"Cliente {num_cliente}: Timeout en la conexión")
+    except ConnectionRefusedError:
+        print(f"Cliente {num_cliente}: No se pudo conectar al servidor")
+    except Exception as e:
+        print(f"Cliente {num_cliente}: Error - {e}")
+
+# Función para ejecutar múltiples clientes
+def ejecutar_varios_clientes(num_clientes=3):
+    import threading
+    
+    threads = []
+    for i in range(num_clientes):
+        # Pequeño delay entre conexiones para ver mejor la concurrencia
+        time.sleep(0.5)
+        thread = threading.Thread(target=cliente_tiempo, args=(i+1,))
+        threads.append(thread)
+        thread.start()
+    
+    # Esperar a que todos los clientes terminen
+    for thread in threads:
+        thread.join()
+
+if __name__ == "__main__":
+    # Ejecutar un solo cliente o múltiples clientes
+    opcion = input("¿Ejecutar múltiples clientes? (s/n): ").lower()
+    
+    if opcion == 's':
+        num_clientes = int(input("Número de clientes a ejecutar: "))
+        ejecutar_varios_clientes(num_clientes)
+    else:
+        cliente_tiempo()
