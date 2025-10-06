@@ -21,12 +21,10 @@ def comparar_tiempos(tiempo_cliente, tiempo_servidor, diferencia):
     else:
         estado = "C = Cc - Los relojes están SINCRONIZADOS"
     
-    print(f"\n--- ANÁLISIS DE TIEMPOS ---")
     print(f"Hora del cliente (C): {datetime.datetime.fromtimestamp(tiempo_cliente)}")
     print(f"Hora del servidor (Cc): {datetime.datetime.fromtimestamp(tiempo_servidor)}")
     print(f"Diferencia: {diferencia:.6f} segundos")
     print(f"Estado: {estado}")
-    print("--- FIN ANÁLISIS ---\n")
 
 def cliente_tiempo(num_cliente=1):
     IPServidor = "localhost"

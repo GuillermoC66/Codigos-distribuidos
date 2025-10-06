@@ -4,7 +4,7 @@ import threading
 import time
 
 # Dirección y puerto del servidor
-direcServidor = "0.0.0.0"
+direcServidor = "0.0.0.0" #Uso 0.0.0.0 por que estoy en un servidor en la nube
 puertoServidor = 9099
 
 # Contador de clientes conectados
