@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package clima;
+
+// Mensaje enviado por el cliente
+message PeticionClima {
+  string ciudad = 1;
+}
+
+// Mensaje enviado por el servidor (stream)
+message Pronostico {
+  string dia = 1;
+  string descripcion = 2;
+  float temperatura = 3;
+}
+
+// Servicio gRPC
+service Clima {
+  // El cliente pide el clima y el servidor responde con un stream
+  rpc ObtenerPronostico(PeticionClima) returns (stream Pronostico);
+}
+

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package calculadora;
+// Definición del servicio Calculadora
+service Calculadora {
+  rpc Suma (Numeros) returns (Resultado);
+  rpc Resta (Numeros) returns (Resultado);
+  rpc Multi (Numeros) returns (Resultado);
+  rpc Div (Numeros) returns (Resultado);
+}
+
+// Mensaje que contiene los dos números de entrada
+message Numeros {
+  float a = 1;
+  float b = 2;
+}
+
+// Mensaje que contiene el resultado
+message Resultado {
+  float resul = 1;
+}
