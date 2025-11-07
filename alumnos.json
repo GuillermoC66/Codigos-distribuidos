@@ -1,0 +1,30 @@
+{
+  "c6aa8a43-ba37-4e2e-8afb-b80a57e10c59": {
+    "id": "c6aa8a43-ba37-4e2e-8afb-b80a57e10c59",
+    "nombre": "Memo",
+    "apellido": "Carrillo",
+    "edad": 25,
+    "curso": "Sistemas Distribuidos",
+    "direccion": "cda 123",
+    "fecha_registro": "2025-11-07T05:46:31.478026",
+    "fecha_actualizacion": "2025-11-07T05:47:42.865831"
+  },
+  "35af5997-d833-4458-b3ab-edac4acb92d1": {
+    "id": "35af5997-d833-4458-b3ab-edac4acb92d1",
+    "nombre": "Isaias",
+    "apellido": "Meza",
+    "edad": 23,
+    "curso": "Microcomputadoras",
+    "direccion": "Calle 23",
+    "fecha_registro": "2025-11-07T05:48:17.793347"
+  },
+  "fa60c7cc-9b6a-4e6f-974a-ad59764dc3a7": {
+    "id": "fa60c7cc-9b6a-4e6f-974a-ad59764dc3a7",
+    "nombre": "Alejandro",
+    "apellido": "Dominguez",
+    "edad": 24,
+    "curso": "Circuitos Electricos",
+    "direccion": "Cda los alpes",
+    "fecha_registro": "2025-11-07T05:49:00.454532"
+  }
+}
